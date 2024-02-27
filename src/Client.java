@@ -66,21 +66,22 @@ public class Client {
                 game.getBoardList().add(game.cloneCurrentBoard(game.getCurrentBoard()));
 
                 Player isWinner = gameController.checkWinner(game,move);
+                boolean isDraw = gameController.checkDraw(game);
 
                 no_of_moves ++;
-                if(move.getPlayer().getPlayertype().equals(PLAYERTYPE.HUMAN) && no_of_moves > 1 ||
-                        (move.getPlayer().getPlayertype().equals(PLAYERTYPE.HUMAN))){
+                if(move.getPlayer().getPlayertype().equals(PLAYERTYPE.HUMAN)){
                     System.out.println("Do you want to UNDO the move? Y/N");
                     String isUndo = sc.next();
 
                     if(isUndo.equalsIgnoreCase("Y")){
-                        game = gameController.UNDO(game,move);
+                        game = gameController.undo(game,move);
                         System.out.println(currentPlayer.getPlayerName() +"'s Move:");
                         Move newMove = gameController.executeMove(game,currentPlayer);
 
                         game.getPlayedMoves().add(newMove);
                         game.getBoardList().add(game.cloneCurrentBoard(game.getCurrentBoard()));
                         isWinner = gameController.checkWinner(game,newMove);
+                        isDraw = gameController.checkDraw(game);
                     }
                 }
 
@@ -89,7 +90,7 @@ public class Client {
                 if(isWinner != null){
                     System.out.println("Winner of the game is: " + isWinner.getPlayerName());
                     break;
-                } else if (no_of_moves == dimension * dimension) {
+                } else if (no_of_moves == dimension * dimension || isDraw) {
                     System.out.println("Game is a draw");
                     break;
                 }

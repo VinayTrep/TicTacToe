@@ -11,6 +11,11 @@ public class OrderNWinningStrategy implements WinningStrategy{
     }
 
     @Override
+    public boolean checkDraw() {
+        return false;
+    }
+
+    @Override
     public void undoMove(Game game, Move lastMove) {
 
     }

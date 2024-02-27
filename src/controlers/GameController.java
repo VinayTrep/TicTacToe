@@ -1,9 +1,6 @@
 package controlers;
 
-import models.Board;
-import models.Game;
-import models.Move;
-import models.Player;
+import models.*;
 import services.GameStrategies.STRATEGYTYPE;
 import services.GameStrategies.WinningStrategy;
 import services.GameStrategies.WinningStrategyFactory;
@@ -23,7 +20,9 @@ public class GameController {
         return player.makeMove(game.getCurrentBoard());
     }
 
-
+    public boolean checkDraw(Game game){
+        return game.getWinningStrategy().checkDraw();
+    }
 
 
     public Player checkWinner(Game game, Move lastMove){
@@ -34,30 +33,28 @@ public class GameController {
         board.displayBoard();
     }
 
-    public Game UNDO(Game game, Move lastMove){
-
-        // creating a new clone of the game class using prototype DP
-        Game newGame = game.clone();
+    public Game undo(Game game, Move lastMove){
 
         // logic to remove the last Move and Board from the List<Board> and List<Move> in  game class
-        int getMovesSize = game.getPlayedMoves().size();
 
-        game.getBoardList().remove(getMovesSize-1);
         List<Board> boardList = game.getBoardList();
+        boardList.remove(boardList.size()-1);
 
-        game.getPlayedMoves().remove(getMovesSize-1);
         List<Move> moveList = game.getPlayedMoves();
+        moveList.remove(moveList.get(moveList.size()-1));
 
-        newGame.setCurrentBoard(game.getBoardList().get(getMovesSize-2));
-        newGame.setBoardList(boardList);
-        newGame.setPlayedMoves(moveList);
+        game.setBoardList(boardList);
+        game.setPlayedMoves(moveList);
+
+        Cell lastCellPlayed = lastMove.getCell();
+
+        lastCellPlayed.setCellstate(CELLSTATE.EMPTY);
+        lastCellPlayed.setPlayer(null);
 
         //Undo the moves in the hashmaps
         unExecuteMove(game,lastMove);
 
-
-
-        return newGame;
+        return game;
     }
     public void unExecuteMove(Game game,Move move){
         game.getWinningStrategy().undoMove(game,move);
@@ -69,11 +66,12 @@ public class GameController {
 
         for (int i = 0; i < moveList.size(); i++) {
 
-            System.out.println(" Player = " + moveList.get(i).getPlayer().getPlayerName());
-            System.out.println(" Move = " + "Col: " + moveList.get(i).getCell().getRow()
+            System.out.println("Player = " + moveList.get(i).getPlayer().getPlayerName());
+            System.out.println("Move = " + "Col: " + moveList.get(i).getCell().getRow()
                     + " Row: " + moveList.get(i).getCell().getCol());
             System.out.println("Board State : ");
             displayBoard(boardList.get(i));
+            System.out.println();
         }
     }
 }
