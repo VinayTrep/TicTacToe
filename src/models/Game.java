@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Game implements Clonable<Game>{
+public class Game{
 
     private Board currentBoard;
     private Player currentPlayer;
@@ -40,8 +40,8 @@ public class Game implements Clonable<Game>{
         return currentBoard;
     }
 
-    public Board cloneCurrentBoard(Board currentBoard){
-        return new Board(currentBoard);
+    public Board cloneCurrentBoard(){
+        return currentBoard.clone();
     }
 
     public Player getCurrentPlayer() {
@@ -56,9 +56,6 @@ public class Game implements Clonable<Game>{
         return winningStrategy;
     }
 
-    public List<Player> getPlayerList() {
-        return playerList;
-    }
 
     public List<Move> getPlayedMoves() {
         return playedMoves;
@@ -68,9 +65,6 @@ public class Game implements Clonable<Game>{
         return boardList;
     }
 
-    public void setCurrentBoard(Board currentBoard) {
-        this.currentBoard = currentBoard;
-    }
 
     public void setCurrentPlayer(Player currentPlayer) {
         this.currentPlayer = currentPlayer;
@@ -80,13 +74,6 @@ public class Game implements Clonable<Game>{
         this.gamestatus = gamestatus;
     }
 
-    public void setWinningStrategy(WinningStrategy winningStrategy) {
-        this.winningStrategy = winningStrategy;
-    }
-
-    public void setPlayerList(List<Player> playerList) {
-        this.playerList = playerList;
-    }
 
     public void setPlayedMoves(List<Move> playedMoves) {
         this.playedMoves = playedMoves;
@@ -94,11 +81,6 @@ public class Game implements Clonable<Game>{
 
     public void setBoardList(List<Board> boardList) {
         this.boardList = boardList;
-    }
-
-    @Override
-    public Game clone() {
-        return new Game(this.currentBoard,this.winningStrategy,this.playerList);
     }
 
     public static class GameBuilder {

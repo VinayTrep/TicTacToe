@@ -3,9 +3,9 @@ package models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Board {
-    private int dimension;
-    private List<List<Cell>> matrix;
+public class Board implements Clonable<Board>{
+    private final int dimension;
+    private final List<List<Cell>> matrix;
 
     public Board(int dimension) {
         this.dimension = dimension;
@@ -19,7 +19,7 @@ public class Board {
         }
     }
 
-    public Board(Board originalBoard){
+    private Board(Board originalBoard){
         this.dimension = originalBoard.getDimension();
         this.matrix = new ArrayList<>();
 
@@ -27,13 +27,7 @@ public class Board {
             this.matrix.add(new ArrayList<>());
             for (int j = 0; j < originalBoard.getDimension(); j++) {
                 Cell cell = originalBoard.getMatrix().get(i).get(j);
-                Cell cloneCell = originalBoard.getMatrix().get(i).get(j).clone();
-                cloneCell.setRow(cell.getRow());
-                cloneCell.setCol(cell.getCol());
-                cloneCell.setPlayer(cell.getPlayer());
-                cloneCell.setCellstate(cell.getCellstate());
-
-                this.matrix.get(i).add(cloneCell);
+                this.matrix.get(i).add(cell.clone());
             }
         }
     }
@@ -55,4 +49,10 @@ public class Board {
     public List<List<Cell>> getMatrix() {
         return matrix;
     }
+
+    @Override
+    public Board clone() {
+        return new Board(this);
+    }
+
 }

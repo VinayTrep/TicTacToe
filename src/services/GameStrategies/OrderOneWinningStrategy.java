@@ -7,42 +7,39 @@ import models.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 public class OrderOneWinningStrategy implements WinningStrategy{
 
-    private int dimension;
-    private List<HashMap<Character,Integer>> rowList;
-    private List<HashMap<Character,Integer>> colList;
-    private HashMap<Character,Integer> rightDiagnol;
-    private HashMap<Character,Integer> leftDiagnol;
-    private HashMap<Character,Integer> corners;
+    private final int dimension;
+    private final List<HashMap<Character,Integer>> rowList;
+    private final List<HashMap<Character,Integer>> colList;
+    private final HashMap<Character,Integer> rightDiagonal;
+    private final HashMap<Character,Integer> leftDiagonal;
+    private final HashMap<Character,Integer> corners;
 
-    private HashSet<HashMap<Character,Integer>> allHashMapCount;
+    private final HashMap<String,HashMap<Character,Integer>> allHashMapCount;
 
     public OrderOneWinningStrategy(int dimension) {
         this.dimension = dimension;
         this.rowList = new ArrayList<>();
         this.colList = new ArrayList<>();
-        this.rightDiagnol = new HashMap<>();
-        this.leftDiagnol = new HashMap<>();
+        this.rightDiagonal = new HashMap<>();
+        this.leftDiagonal = new HashMap<>();
         corners = new HashMap<>();
-        this.allHashMapCount = new HashSet<>();
+        this.allHashMapCount = new HashMap<>();
 
         // create the rowList and colList with hashmap
         for(int i = 0;i<dimension;i++){
             rowList.add(new HashMap<>());
             colList.add(new HashMap<>());
+            this.allHashMapCount.put(HashMapName.ROW.name()+i,rowList.get(i));
+            this.allHashMapCount.put(HashMapName.COL.name()+i,colList.get(i));
         }
+        allHashMapCount.put(HashMapName.RIGHTDIAGNOL.name(), rightDiagonal);
+        allHashMapCount.put(HashMapName.LEFTDIAGNOL.name(), leftDiagonal);
+        allHashMapCount.put(HashMapName.CORNER.name(),corners);
 
-        this.allHashMapCount.addAll(rowList);
-        this.allHashMapCount.addAll(colList);
-        this.allHashMapCount.add(rightDiagnol);
-        this.allHashMapCount.add(leftDiagnol);
-        this.allHashMapCount.add(corners);
-
-        System.out.println("this is the all hashmap count" + allHashMapCount.size());
     }
 
     private boolean checkCorner(int row,int col){
@@ -53,12 +50,12 @@ public class OrderOneWinningStrategy implements WinningStrategy{
         );
     }
 
-    private boolean checkRightDiaganol(int row,int col){
-        return (row==col);
+    private boolean checkRightDiagonal(int row, int col){
+        return ( row+col == dimension-1);
     }
 
-    private boolean checkLeftDiaganol(int row,int col){
-        return ( row+col == dimension-1);
+    private boolean checkLeftDiagonal(int row, int col){
+        return (row==col);
     }
 
     @Override
@@ -69,11 +66,11 @@ public class OrderOneWinningStrategy implements WinningStrategy{
         int row = cell.getRow();
         int col = cell.getCol();
 
-        boolean isWinner = (checkCorner(row,col) && checkCornerHashMap(symbol,this.corners))
-                            ||(populateHashmap(symbol,rowList.get(row)))
-                || (populateHashmap(symbol,colList.get(col)))
-                || (checkLeftDiaganol(row,col) && populateHashmap(symbol,this.leftDiagnol))
-                || (checkRightDiaganol(row,col) && populateHashmap(symbol,this.rightDiagnol));
+        boolean isWinner = (checkCorner(row,col) && checkCornerHashMap(symbol,this.corners,HashMapName.CORNER.name()))
+                || (populateHashmap(symbol,rowList.get(row),HashMapName.ROW.name()+row))
+                || (populateHashmap(symbol,colList.get(col),HashMapName.COL.name()+col))
+                || (checkLeftDiagonal(row,col) && populateHashmap(symbol,this.leftDiagonal,HashMapName.LEFTDIAGNOL.name()))
+                || (checkRightDiagonal(row,col) && populateHashmap(symbol,this.rightDiagonal,HashMapName.RIGHTDIAGNOL.name()));
 
         if(isWinner){
             return currentPlayer;
@@ -96,38 +93,35 @@ public class OrderOneWinningStrategy implements WinningStrategy{
         int col = cell.getCol();
 
         if(checkCorner(row,col)){
-            dePopulateHashmap(symbol,this.corners);
+            dePopulateHashmap(symbol,this.corners,HashMapName.CORNER.name());
         }
 
-        if(checkLeftDiaganol(row,col)){
-            dePopulateHashmap(symbol,this.leftDiagnol);
+        if(checkLeftDiagonal(row,col)){
+            dePopulateHashmap(symbol,this.leftDiagonal, HashMapName.LEFTDIAGNOL.name());
         }
 
-        if(checkRightDiaganol(row,col)){
-            dePopulateHashmap(symbol,this.rightDiagnol);
+        if(checkRightDiagonal(row,col)){
+            dePopulateHashmap(symbol,this.rightDiagonal,HashMapName.RIGHTDIAGNOL.name());
         }
 
-        dePopulateHashmap(symbol,rowList.get(row));
-        dePopulateHashmap(symbol,colList.get(col));
+        dePopulateHashmap(symbol,rowList.get(row),HashMapName.ROW.name()+row);
+        dePopulateHashmap(symbol,colList.get(col),HashMapName.COL.name()+col);
     }
 
-    private boolean populateHashmap(char symbol, HashMap<Character,Integer> HM){
+    private boolean populateHashmap(char symbol, HashMap<Character,Integer> HM,String key){
 
         if (HM.containsKey(symbol)){
            HM.put(symbol,HM.get(symbol)+1);
+           checkAHMSizeForDrawAndDepopulate(key);
            return HM.get(symbol) == dimension;
         }else{
             HM.put(symbol,1);
-        }
-        if (allHashMapCount.contains(HM)){
-            if (HM.size() >1){
-                allHashMapCount.remove(HM);
-            }
+            checkAHMSizeForDrawAndDepopulate(key);
         }
         return false;
     }
 
-    private void dePopulateHashmap(char symbol, HashMap<Character,Integer> HM){
+    private void dePopulateHashmap(char symbol, HashMap<Character,Integer> HM,String key){
 
         if (HM.containsKey(symbol)){
             HM.put(symbol,HM.get(symbol)-1);
@@ -135,26 +129,26 @@ public class OrderOneWinningStrategy implements WinningStrategy{
             if (HM.get(symbol)==0){
                 HM.remove(symbol);
             }
+            allHashMapCount.put(key,HM);
         }
+    }
+    private void checkAHMSizeForDrawAndDepopulate(String key){
+        if (allHashMapCount.containsKey(key)){
 
-        if (!allHashMapCount.contains(HM)){
-            if (HM.size() < 2){
-                allHashMapCount.add(HM);
+            HashMap<Character,Integer> hm = allHashMapCount.get(key);
+            if (hm.size() > 1){
+                allHashMapCount.remove(key);
             }
         }
     }
-
-    public boolean checkCornerHashMap(char symbol, HashMap<Character,Integer> HM){
+    private boolean checkCornerHashMap(char symbol, HashMap<Character,Integer> HM, String key){
         if (HM.containsKey(symbol)){
             HM.put(symbol,HM.get(symbol)+1);
+            checkAHMSizeForDrawAndDepopulate(key);
             return HM.get(symbol) == 4;
         }else{
             HM.put(symbol,1);
-        }
-        if (allHashMapCount.contains(HM)){
-            if (HM.size() >1){
-                allHashMapCount.remove(HM);
-            }
+            checkAHMSizeForDrawAndDepopulate(key);
         }
         return false;
     }

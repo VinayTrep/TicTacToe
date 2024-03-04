@@ -1,5 +1,5 @@
 package models;
 
 public enum BOTTYPE {
-    EASY,MEDIUM,HARD;
+    EASY,MEDIUM,HARD
 }

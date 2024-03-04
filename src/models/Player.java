@@ -10,8 +10,6 @@ public class Player {
     private PLAYERTYPE playertype;
     private char symbol;
 
-    public Player() {
-    }
 
     public Player(String playerName, int playerId,PLAYERTYPE playertype, char symbol) {
         this.playerName = playerName;
@@ -53,31 +51,13 @@ public class Player {
         return playerName;
     }
 
-    public int getPlayerId() {
-        return playerId;
-    }
 
     public char getSymbol() {
         return symbol;
-    }
-
-    public void setSymbol(char symbol) {
-        this.symbol = symbol;
     }
 
     public PLAYERTYPE getPlayertype() {
         return playertype;
     }
 
-    public void setPlayertype(PLAYERTYPE playertype) {
-        this.playertype = playertype;
-    }
-
-    public void setPlayerName(String playerName) {
-        this.playerName = playerName;
-    }
-
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
-    }
 }

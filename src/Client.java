@@ -63,7 +63,7 @@ public class Client {
                 //set current player, and moves list and boards list for UNDO and Replay purpose
                 game.setCurrentPlayer(currentPlayer);
                 game.getPlayedMoves().add(move);
-                game.getBoardList().add(game.cloneCurrentBoard(game.getCurrentBoard()));
+                game.getBoardList().add(game.cloneCurrentBoard());
 
                 Player isWinner = gameController.checkWinner(game,move);
                 boolean isDraw = gameController.checkDraw(game);
@@ -79,7 +79,7 @@ public class Client {
                         Move newMove = gameController.executeMove(game,currentPlayer);
 
                         game.getPlayedMoves().add(newMove);
-                        game.getBoardList().add(game.cloneCurrentBoard(game.getCurrentBoard()));
+                        game.getBoardList().add(game.cloneCurrentBoard());
                         isWinner = gameController.checkWinner(game,newMove);
                         isDraw = gameController.checkDraw(game);
                     }
@@ -89,10 +89,10 @@ public class Client {
 
                 if(isWinner != null){
                     System.out.println("Winner of the game is: " + isWinner.getPlayerName());
-                    break;
+                    game.setGamestatus(GAMESTATUS.WINNER);
                 } else if (no_of_moves == dimension * dimension || isDraw) {
                     System.out.println("Game is a draw");
-                    break;
+                    game.setGamestatus(GAMESTATUS.DRAW);
                 }
 
             }
@@ -113,6 +113,7 @@ public class Client {
             if(! isContinue.equalsIgnoreCase("Y")){
                 isGameOn = false;
             }
+
         }
     }
 }

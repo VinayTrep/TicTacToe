@@ -1,8 +1,8 @@
 package models;
 
 public class Cell implements Clonable<Cell>{
-    private int row;
-    private int col;
+    private final int row;
+    private final int col;
     private Player player;
     private CELLSTATE cellstate;
 
@@ -13,9 +13,17 @@ public class Cell implements Clonable<Cell>{
         this.cellstate = CELLSTATE.EMPTY;
     }
 
+    private Cell(Cell oldCell){
+        this.row = oldCell.getRow();
+        this.col = oldCell.getCol();
+        this.player = oldCell.getPlayer();
+        this.cellstate = oldCell.cellstate;
+    }
+
+
     @Override
     public Cell clone() {
-        return new Cell(0,0);
+        return new Cell(this);
     }
 
     public void printCell() {
@@ -50,11 +58,4 @@ public class Cell implements Clonable<Cell>{
         this.cellstate = cellstate;
     }
 
-    public void setRow(int row) {
-        this.row = row;
-    }
-
-    public void setCol(int col) {
-        this.col = col;
-    }
 }
