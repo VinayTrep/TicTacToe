@@ -115,5 +115,6 @@ public class Client {
             }
 
         }
+        System.out.println("Thank you for playing");
     }
 }
